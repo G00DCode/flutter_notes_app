@@ -44,10 +44,51 @@ class _NotesAppScreenState extends State<NotesAppScreen> {
         child: Icon(Icons.add),
       ),
       body: ListView.builder(itemBuilder: (context,index){
-        return ListTile(
-          leading: Text("${fetchNotesList[index].id}"),
-          title: Text("${fetchNotesList[index].title}"),
-          subtitle: Text("${fetchNotesList[index].desc}"),
+        return InkWell(
+          onTap: (){
+            titleController.text=fetchNotesList[index].title;
+            descController.text=fetchNotesList[index].desc;
+            showModalBottomSheet(context: context, builder: (BuildContext context){
+              return Container(
+                height: 600,
+                width: 400,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      UiHelper.CustomTextField(titleController, "Title", Icons.title),
+                      UiHelper.CustomTextField(descController, "Description", Icons.description),
+                      SizedBox(height: 20,),
+                      ElevatedButton(onPressed: (){
+                        var utitle= titleController.text.toString();
+                        var udesc= descController.text.toString();
+                        dbHelper.UpdateNotes(NotesModel(title: utitle, desc: udesc));
+                      }, child: Text("Update")),
+
+
+
+                    ],
+                  ),
+                ),
+              );
+
+            }
+            );},
+          child: ListTile(
+            leading: Text("${fetchNotesList[index].id}"),
+            title: Text("${fetchNotesList[index].title}"),
+            subtitle: Text("${fetchNotesList[index].desc}"),
+            trailing: IconButton(
+              onPressed: ()async{
+                await dbHelper.DeleteNotes(fetchNotesList[index].id!);
+              },
+              icon: Icon(Icons.delete),
+            ),
+          ),
         );
       }),
     );
@@ -55,25 +96,28 @@ class _NotesAppScreenState extends State<NotesAppScreen> {
   _showModalBottomSheet(){
     return showModalBottomSheet(context: context, builder: (BuildContext context){
       return Container(
-        height: 400,
+        height: 600,
         width: 400,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(25),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            UiHelper.CustomTextField(titleController, "Title", Icons.title),
-            UiHelper.CustomTextField(descController, "Description", Icons.description),
-            SizedBox(height: 20,),
-            ElevatedButton(onPressed: (){
-              dbHelper.addNotes(NotesModel(title: titleController.text.toString(), desc: descController.text.toString()));
-              setState(() {
-                getAllNotes();
-              });
-            }, child: Text("Save")),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              UiHelper.CustomTextField(titleController, "Title", Icons.title),
+              UiHelper.CustomTextField(descController, "Description", Icons.description),
+              SizedBox(height: 20,),
+              ElevatedButton(onPressed: (){
+                dbHelper.addNotes(NotesModel(title: titleController.text.toString(), desc: descController.text.toString()));
+                setState(() {
+                  getAllNotes();
+                });
+              }, child: Text("Save")),
 
-          ],
+            ],
+          ),
         ),
       );
     });
