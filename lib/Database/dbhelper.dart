@@ -29,7 +29,7 @@ class DbHelper{
     });
   }
 
-  addNotes(NotesModel notesModel)async{
+  insertNotes(NotesModel notesModel)async{
   var db= await getDb();
   db.insert(note_table, notesModel.toMap());
   }
@@ -46,7 +46,7 @@ class DbHelper{
     return listnotes;
 
   }
-  Future<void>UpdateNotes(NotesModel notesModel)async{
+  UpdateNotes(NotesModel notesModel)async{
     var db= await getDb();
     db.update(note_table, notesModel.toMap(), where: "$note_id=${notesModel.id}");
 
